@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Hábito Tracker</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      body {
+        background: linear-gradient(
+          180deg,
+          #6a82fb 0%,
+          #fc5c7d 100%
+        ); 
+        background: linear-gradient(
+          160deg,
+          #4b6cb7 0%,
+          #182848 100%
+        ); 
+        background: linear-gradient(
+          135deg,
+          #7f7fd5 0%,
+          #86a8e7 50%,
+          #91eae4 100%
+        );
+        background: linear-gradient(
+          to bottom right,
+          #526bf4,
+          #a152f4
+        );
+
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .login-container {
+        background-color: white;
+        padding: 40px 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+      }
+
+      .login-header h2 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 1.8rem;
+      }
+
+      .login-header p {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 0.9rem;
+      }
+      .input-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #444;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px; 
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.3s;
+        background-color: #f9f9f9;
+      }
+
+      .input-group input:focus {
+        border-color: #a152f4;
+        background-color: #fff;
+      }
+      .btn-login {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(
+          90deg,
+          #6a85b6 0%,
+          #bac8e0 100%
+        ); 
+        background: linear-gradient(
+          to right,
+          #526bf4,
+          #a152f4
+        ); 
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 10px;
+      }
+
+      .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(82, 107, 244, 0.4);
+      }
+
+      .extra-links {
+        margin-top: 20px;
+        font-size: 0.85rem;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .extra-links a {
+        text-decoration: none;
+        color: #666;
+        transition: color 0.3s;
+      }
+
+      .extra-links a:hover {
+        color: #526bf4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-header">
+        <h2 style="font-size: 3rem">👋</h2>
+        <h2>Bem-vindo de volta</h2>
+        <p>Continue construindo seus hábitos!</p>
+      </div>
+
+      <form action="#" method="POST">
+        <div class="input-group">
+          <label for="email">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="exemplo@email.com"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="password">Senha</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Sua senha secreta"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn-login">Entrar</button>
+
+        <div class="extra-links">
+          <a href="#">Esqueci a senha</a>
+          <a id="reg" href="C:\Users\BM-USER\Desktop\Habits\cadastro\cadastro.html"><strong>Criar conta</strong></a>
+        </div>
+      </form>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    
+    const listaUsuarios = [
+        "admin@email.com",      
+        "dev@python.com",       
+        "aluno@sistema.com",    
+        "eu@teste.com"          
+    ];
+
+    const listaSenhas = [
+        "admin123",             
+        "python_top",         
+        "faculdade2025",        
+        "123456"             
+    ];
+
+    const form = document.querySelector('form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const submitBtn = document.querySelector('.btn-login');
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const emailDigitado = emailInput.value.trim();
+        const senhaDigitada = passwordInput.value.trim();
+
+        if (emailDigitado === '' || senhaDigitada === '') {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+
+        startLoading();
+
+        setTimeout(() => {
+
+            const indiceDoUsuario = listaUsuarios.indexOf(emailDigitado);
+
+            if (indiceDoUsuario !== -1) {
+                
+                if (listaSenhas[indiceDoUsuario] === senhaDigitada) {
+                    window.location.href = "C:/Users/BM-USER/Desktop/Habits/pagina principal/index.html"; 
+                } else {
+
+                    alert("Senha incorreta para este usuário.");
+                    stopLoading();
+                    passwordInput.value = "";
+                    passwordInput.focus();
+                }
+
+            } else {
+                alert("Usuário não encontrado.");
+                stopLoading();
+                emailInput.focus(); 
+            }
+
+        }, 1000); 
+    });
+
+    function startLoading() {
+        submitBtn.innerHTML = 'Verificando...';
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.7';
+    }
+
+    function stopLoading() {
+        submitBtn.innerHTML = 'Entrar';
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+    }
+});
+</script>
+    </body>
+  </body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro - Hábito Tracker</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(to bottom right, #526bf4, #a152f4);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .auth-container {
+        background-color: white;
+        padding: 40px 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+      }
+
+      .auth-header h2 {
+        color: #333;
+        margin-bottom: 5px;
+        font-size: 1.8rem;
+      }
+
+      .auth-header p {
+        color: #666;
+        margin-bottom: 25px;
+        font-size: 0.9rem;
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+        text-align: left;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 6px;
+        color: #444;
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.3s, background-color 0.3s;
+        background-color: #f9f9f9;
+      }
+
+      .input-group input:focus {
+        border-color: #a152f4;
+        background-color: #fff;
+      }
+
+      .btn-submit {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(to right, #526bf4, #a152f4);
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 15px;
+      }
+
+      .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(82, 107, 244, 0.4);
+      }
+
+      .footer-links {
+        margin-top: 25px;
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .footer-links a {
+        text-decoration: none;
+        color: #a152f4;
+        font-weight: bold;
+        transition: color 0.3s;
+      }
+
+      .footer-links a:hover {
+        color: #526bf4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-header">
+        <h2>Crie sua conta 🚀</h2>
+        <p>Comece a mudar seus hábitos hoje.</p>
+      </div>
+
+      <form id="registerForm" action="#" method="POST">
+        <div class="input-group">
+          <label for="name">Nome Completo</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Como você quer ser chamado?"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="email">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="seu@email.com"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="password">Senha</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Mínimo 6 caracteres"
+            required
+            minlength="6"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="confirmPassword">Confirmar Senha</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="Digite a senha novamente"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn-submit">Criar Conta Grátis</button>
+
+        <div class="footer-links">
+          Já tem uma conta?
+          <a href="C:\Users\BM-USER\Desktop\Habits\index\Index.html"
+            >Faça Login</a
+          >
+        </div>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById("registerForm");
+      const pass = document.getElementById("password");
+      const confirmPass = document.getElementById("confirmPassword");
+
+      form.addEventListener("submit", function (e) {
+        if (pass.value !== confirmPass.value) {
+          e.preventDefault(); // Impede o envio
+          alert("As senhas não coincidem!");
+          confirmPass.style.borderColor = "red";
+          confirmPass.focus();
+        }
+      });
+    </script>
+  </body>
+</html>

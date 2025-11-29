@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gerenciador de Hábitos</title>
+    <script src="/_sdk/data_sdk.js"></script>
+    <script src="/_sdk/element_sdk.js"></script>
+    <style>
+      body {
+        box-sizing: border-box;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #2d3748;
+        overflow-x: hidden;
+      }
+
+      .container {
+        width: 100%;
+        min-height: 100%;
+        padding: 48px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 48px;
+        max-width: 600px;
+      }
+
+      .title {
+        font-size: 48px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 12px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .subtitle {
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
+      }
+
+      .stats-container {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 800px;
+        width: 100%;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        padding: 24px;
+        min-width: 180px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .stat-value {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #718096;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .add-habit-section {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 32px;
+        margin-bottom: 32px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        width: 100%;
+      }
+
+      .form-group {
+        margin-bottom: 24px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .habits-list {
+        max-width: 800px;
+        width: 100%;
+      }
+
+      .habit-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+        border-left: 4px solid #667eea;
+      }
+
+      .habit-card:hover {
+        transform: translateX(4px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .habit-card.completed {
+        border-left-color: #48bb78;
+        opacity: 0.8;
+      }
+
+      .habit-info {
+        flex: 1;
+      }
+
+      .habit-name {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 8px;
+      }
+
+      .habit-stats {
+        display: flex;
+        gap: 16px;
+        font-size: 14px;
+        color: #718096;
+      }
+
+      .habit-stat {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .habit-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .btn-complete {
+        background: #48bb78;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-complete:hover {
+        background: #38a169;
+        transform: scale(1.05);
+      }
+
+      .btn-complete:disabled {
+        background: #cbd5e0;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-delete {
+        background: #f56565;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-delete:hover {
+        background: #e53e3e;
+        transform: scale(1.05);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 64px 24px;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .empty-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+      }
+
+      .empty-text {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .empty-subtext {
+        font-size: 16px;
+        opacity: 0.8;
+      }
+
+      .loading {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      .streak-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      @media (max-width: 640px) {
+        .title {
+          font-size: 36px;
+        }
+
+        .subtitle {
+          font-size: 16px;
+        }
+
+        .habit-card {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 16px;
+        }
+
+        .habit-actions {
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
+    </style>
+    <style>
+      @view-transition {
+        navigation: auto;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1 class="title" id="page-title">Meus Hábitos</h1>
+        <p class="subtitle" id="subtitle">Construa sua melhor versão</p>
+      </div>
+      <div class="stats-container">
+        <div class="stat-card">
+          <div class="stat-value" style="color: #667eea" id="total-habits">
+            0
+          </div>
+          <div class="stat-label">Total de Hábitos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color: #48bb78" id="completed-today">
+            0
+          </div>
+          <div class="stat-label">Completados Hoje</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color: #f6ad55" id="best-streak">
+            0
+          </div>
+          <div class="stat-label">Melhor Sequência</div>
+        </div>
+      </div>
+      <div class="add-habit-section">
+        <form id="habit-form">
+          <div class="form-group">
+            <label for="habit-name" class="form-label">Nome do Hábito</label>
+            <input
+              type="text"
+              id="habit-name"
+              class="form-input"
+              placeholder="Ex: Meditar 10 minutos"
+              required
+            />
+          </div>
+          <button type="submit" class="btn-primary" id="add-button">
+            <span id="add-button-text">➕ Novo Hábito</span>
+          </button>
+        </form>
+      </div>
+      <div class="habits-list" id="habits-list">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">🎯</div>
+          <div class="empty-text">Nenhum hábito ainda</div>
+          <div class="empty-subtext">
+            Adicione seu primeiro hábito e comece sua jornada!
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const defaultConfig = {
+        page_title: "Meus Hábitos",
+        subtitle: "Construa sua melhor versão",
+        add_button_text: "Novo Hábito",
+        complete_button_text: "Completar",
+        background_color: "#667eea",
+        surface_color: "#ffffff",
+        text_color: "#2d3748",
+        primary_action_color: "#667eea",
+        secondary_action_color: "#48bb78",
+        font_family: "Inter",
+        font_size: 16,
+      };
+
+      let habits = [];
+      let isLoading = false;
+
+      const dataHandler = {
+        onDataChanged(data) {
+          habits = data;
+          renderHabits();
+          updateStats();
+        },
+      };
+
+      // Fallback lightweight SDK stubs for local development/testing when SDK
+      // scripts aren't available. These mimic async behavior and persist to
+      // localStorage so behavior is consistent across page loads.
+      if (!window.dataSdk) {
+        window.dataSdk = (function () {
+          const STORAGE_KEY = "local_habits_v1";
+          let handler = null;
+
+          function load() {
+            try {
+              return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+            } catch (e) {
+              return [];
+            }
+          }
+
+          function save(items) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(items || []));
+          }
+
+          return {
+            init: async function (h) {
+              handler = h;
+              const items = load();
+              // normalize items to include __backendId when missing
+              const normalized = items.map((it) => ({
+                ...it,
+                __backendId:
+                  it.__backendId ||
+                  it.id ||
+                  String(it.created_at || Date.now()),
+              }));
+              save(normalized);
+              if (handler && typeof handler.onDataChanged === "function") {
+                handler.onDataChanged(normalized);
+              }
+              return { isOk: true };
+            },
+            create: async function (newItem) {
+              const items = load();
+              const __backendId =
+                "local-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+              const item = { ...newItem, __backendId };
+              items.push(item);
+              save(items);
+              if (handler && typeof handler.onDataChanged === "function")
+                handler.onDataChanged(items);
+              return { isOk: true, id: __backendId };
+            },
+            update: async function (updatedItem) {
+              const items = load();
+              const idx = items.findIndex(
+                (i) =>
+                  i.__backendId === updatedItem.__backendId ||
+                  i.id === updatedItem.id
+              );
+              if (idx >= 0) {
+                items[idx] = { ...items[idx], ...updatedItem };
+                save(items);
+                if (handler && typeof handler.onDataChanged === "function")
+                  handler.onDataChanged(items);
+                return { isOk: true };
+              }
+              return { isOk: false };
+            },
+            delete: async function (itemToDelete) {
+              let items = load();
+              items = items.filter(
+                (i) =>
+                  !(
+                    i.__backendId === itemToDelete.__backendId ||
+                    i.id === itemToDelete.id
+                  )
+              );
+              save(items);
+              if (handler && typeof handler.onDataChanged === "function")
+                handler.onDataChanged(items);
+              return { isOk: true };
+            },
+          };
+        })();
+      }
+
+      if (!window.elementSdk) {
+        window.elementSdk = {
+          init: function (opts) {
+            if (opts && typeof opts.onConfigChange === "function") {
+              opts.onConfigChange(opts.defaultConfig || {});
+            }
+            return opts;
+          },
+          setConfig: function (cfg) {
+            /* noop for local */
+          },
+        };
+      }
+
+      async function init() {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error("Failed to initialize data SDK");
+        }
+      }
+
+      function renderHabits() {
+        const habitsList = document.getElementById("habits-list");
+        const emptyState = document.getElementById("empty-state");
+
+        if (habits.length === 0) {
+          emptyState.style.display = "block";
+          const existingCards = habitsList.querySelectorAll(".habit-card");
+          existingCards.forEach((card) => card.remove());
+          return;
+        }
+
+        emptyState.style.display = "none";
+
+        const existingCards = new Map(
+          [...habitsList.querySelectorAll(".habit-card")].map((el) => [
+            el.dataset.habitId,
+            el,
+          ])
+        );
+
+        habits.forEach((habit) => {
+          const backendId =
+            habit.__backendId ||
+            habit.id ||
+            String(habit.created_at || Date.now());
+          if (existingCards.has(backendId)) {
+            updateHabitCard(existingCards.get(backendId), habit);
+            existingCards.delete(backendId);
+          } else {
+            habitsList.appendChild(createHabitCard(habit));
+          }
+        });
+
+        existingCards.forEach((card) => card.remove());
+      }
+
+      function createHabitCard(habit) {
+        const card = document.createElement("div");
+        const backendId =
+          habit.__backendId ||
+          habit.id ||
+          String(habit.created_at || Date.now());
+        card.className = `habit-card${
+          habit.completed_today ? " completed" : ""
+        }`;
+        card.dataset.habitId = backendId;
+
+        const completeButtonText =
+          window.elementSdk?.config?.complete_button_text ||
+          defaultConfig.complete_button_text;
+
+        card.innerHTML = `
+          <div class="habit-info">
+            <div class="habit-name">${escapeHtml(habit.name)}</div>
+            <div class="habit-stats">
+              <div class="habit-stat">
+                ${
+                  habit.streak > 0
+                    ? `<span class="streak-badge">🔥 ${habit.streak} dias</span>`
+                    : ""
+                }
+              </div>
+              <div class="habit-stat">
+                📊 ${habit.total_completions} vezes completado
+              </div>
+            </div>
+          </div>
+          <div class="habit-actions">
+            <button class="btn-complete" ${
+              habit.completed_today ? "disabled" : ""
+            }>
+              ${habit.completed_today ? "✓ Feito" : completeButtonText}
+            </button>
+            <button class="btn-delete">🗑</button>
+          </div>
+        `;
+
+        // Attach event listeners instead of inline onclick handlers
+        const completeBtn = card.querySelector(".btn-complete");
+        const deleteBtn = card.querySelector(".btn-delete");
+        if (completeBtn) {
+          completeBtn.addEventListener("click", () => completeHabit(backendId));
+        }
+        if (deleteBtn) {
+          deleteBtn.addEventListener("click", () => deleteHabit(backendId));
+        }
+
+        return card;
+      }
+
+      function updateHabitCard(card, habit) {
+        card.className = `habit-card${
+          habit.completed_today ? " completed" : ""
+        }`;
+
+        const completeButtonText =
+          window.elementSdk?.config?.complete_button_text ||
+          defaultConfig.complete_button_text;
+
+        const nameEl = card.querySelector(".habit-name");
+        nameEl.textContent = habit.name;
+
+        const streakStat = card.querySelector(
+          ".habit-stats .habit-stat:first-child"
+        );
+        streakStat.innerHTML =
+          habit.streak > 0
+            ? `<span class="streak-badge">🔥 ${habit.streak} dias</span>`
+            : "";
+
+        const totalStat = card.querySelector(
+          ".habit-stats .habit-stat:nth-child(2)"
+        );
+        totalStat.textContent = `📊 ${habit.total_completions} vezes completado`;
+
+        const backendId =
+          habit.__backendId ||
+          habit.id ||
+          String(habit.created_at || Date.now());
+        const completeBtn = card.querySelector(".btn-complete");
+        if (completeBtn) {
+          completeBtn.textContent = habit.completed_today
+            ? "✓ Feito"
+            : completeButtonText;
+          completeBtn.disabled = habit.completed_today;
+          completeBtn.onclick = () => completeHabit(backendId);
+        }
+        const deleteBtn = card.querySelector(".btn-delete");
+        if (deleteBtn) {
+          deleteBtn.onclick = () => deleteHabit(backendId);
+        }
+        card.dataset.habitId = backendId;
+      }
+
+      function updateStats() {
+        const totalHabits = habits.length;
+        const completedToday = habits.filter((h) => h.completed_today).length;
+        const bestStreak = Math.max(0, ...habits.map((h) => h.streak));
+
+        document.getElementById("total-habits").textContent = totalHabits;
+        document.getElementById("completed-today").textContent = completedToday;
+        document.getElementById("best-streak").textContent = bestStreak;
+      }
+
+      async function addHabit(event) {
+        event.preventDefault();
+
+        if (isLoading) return;
+
+        if (habits.length >= 999) {
+          showToast(
+            "Limite máximo de 999 hábitos atingido. Por favor, delete alguns hábitos primeiro."
+          );
+          return;
+        }
+
+        const input = document.getElementById("habit-name");
+        const name = input.value.trim();
+
+        if (!name) return;
+
+        isLoading = true;
+        const addButton = document.getElementById("add-button");
+        addButton.classList.add("loading");
+        addButton.disabled = true;
+
+        const newHabit = {
+          id: Date.now().toString(),
+          name: name,
+          streak: 0,
+          completed_today: false,
+          total_completions: 0,
+          created_at: new Date().toISOString(),
+        };
+
+        const result = await window.dataSdk.create(newHabit);
+
+        isLoading = false;
+        addButton.classList.remove("loading");
+        addButton.disabled = false;
+
+        if (result.isOk) {
+          input.value = "";
+          showToast("Hábito adicionado com sucesso! 🎉");
+        } else {
+          showToast("Erro ao adicionar hábito. Tente novamente.");
+        }
+      }
+
+      async function completeHabit(backendId) {
+        if (isLoading) return;
+
+        const habit = habits.find((h) => h.__backendId === backendId);
+        if (!habit || habit.completed_today) return;
+
+        isLoading = true;
+
+        const updatedHabit = {
+          ...habit,
+          completed_today: true,
+          streak: habit.streak + 1,
+          total_completions: habit.total_completions + 1,
+        };
+
+        const result = await window.dataSdk.update(updatedHabit);
+
+        isLoading = false;
+
+        if (result.isOk) {
+          showToast("Parabéns! Hábito completado! 🎊");
+        } else {
+          showToast("Erro ao completar hábito. Tente novamente.");
+        }
+      }
+
+      async function deleteHabit(backendId) {
+        if (isLoading) return;
+
+        const habit = habits.find((h) => h.__backendId === backendId);
+        if (!habit) return;
+
+        isLoading = true;
+
+        const result = await window.dataSdk.delete(habit);
+
+        isLoading = false;
+
+        if (result.isOk) {
+          showToast("Hábito removido");
+        } else {
+          showToast("Erro ao remover hábito. Tente novamente.");
+        }
+      }
+
+      function showToast(message) {
+        const toast = document.createElement("div");
+        toast.textContent = message;
+        toast.style.cssText = `
+          position: fixed;
+          bottom: 24px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(0, 0, 0, 0.8);
+          color: white;
+          padding: 16px 24px;
+          border-radius: 12px;
+          font-weight: 600;
+          z-index: 1000;
+          animation: fadeIn 0.3s ease;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          toast.style.animation = "fadeOut 0.3s ease";
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      document
+        .getElementById("habit-form")
+        .addEventListener("submit", addHabit);
+
+      async function onConfigChange(config) {
+        const pageTitle = document.getElementById("page-title");
+        const subtitle = document.getElementById("subtitle");
+        const addButtonText = document.getElementById("add-button-text");
+
+        pageTitle.textContent = config.page_title || defaultConfig.page_title;
+        subtitle.textContent = config.subtitle || defaultConfig.subtitle;
+        addButtonText.textContent =
+          "➕ " + (config.add_button_text || defaultConfig.add_button_text);
+
+        const completeButtons = document.querySelectorAll(
+          ".btn-complete:not(:disabled)"
+        );
+        completeButtons.forEach((btn) => {
+          if (!btn.textContent.includes("✓")) {
+            btn.textContent =
+              config.complete_button_text || defaultConfig.complete_button_text;
+          }
+        });
+
+        const customFont = config.font_family || defaultConfig.font_family;
+        const baseFontStack =
+          "-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+        document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
+
+        const baseSize = config.font_size || defaultConfig.font_size;
+        document.querySelector(".title").style.fontSize = baseSize * 3 + "px";
+        document.querySelector(".subtitle").style.fontSize =
+          baseSize * 1.25 + "px";
+        document
+          .querySelectorAll(".habit-name")
+          .forEach((el) => (el.style.fontSize = baseSize * 1.25 + "px"));
+        document.body.style.fontSize = baseSize + "px";
+
+        const bgColor =
+          config.background_color || defaultConfig.background_color;
+        document.body.style.background = `linear-gradient(135deg, ${bgColor} 0%, #764ba2 100%)`;
+
+        const surfaceColor =
+          config.surface_color || defaultConfig.surface_color;
+        document
+          .querySelectorAll(".stat-card, .add-habit-section, .habit-card")
+          .forEach((el) => {
+            el.style.background = "rgba(255, 255, 255, 0.95)";
+          });
+
+        const textColor = config.text_color || defaultConfig.text_color;
+        document.querySelectorAll(".habit-name, .form-label").forEach((el) => {
+          el.style.color = textColor;
+        });
+
+        const primaryColor =
+          config.primary_action_color || defaultConfig.primary_action_color;
+        document.querySelector(
+          ".btn-primary"
+        ).style.background = `linear-gradient(135deg, ${primaryColor} 0%, #764ba2 100%)`;
+
+        const secondaryColor =
+          config.secondary_action_color || defaultConfig.secondary_action_color;
+        document
+          .querySelectorAll(".btn-complete:not(:disabled)")
+          .forEach((el) => {
+            el.style.background = secondaryColor;
+          });
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () =>
+                  config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  config.background_color = value;
+                  window.elementSdk.setConfig({ background_color: value });
+                },
+              },
+              {
+                get: () => config.surface_color || defaultConfig.surface_color,
+                set: (value) => {
+                  config.surface_color = value;
+                  window.elementSdk.setConfig({ surface_color: value });
+                },
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  config.text_color = value;
+                  window.elementSdk.setConfig({ text_color: value });
+                },
+              },
+              {
+                get: () =>
+                  config.primary_action_color ||
+                  defaultConfig.primary_action_color,
+                set: (value) => {
+                  config.primary_action_color = value;
+                  window.elementSdk.setConfig({ primary_action_color: value });
+                },
+              },
+              {
+                get: () =>
+                  config.secondary_action_color ||
+                  defaultConfig.secondary_action_color,
+                set: (value) => {
+                  config.secondary_action_color = value;
+                  window.elementSdk.setConfig({
+                    secondary_action_color: value,
+                  });
+                },
+              },
+            ],
+            borderables: [],
+            fontEditable: {
+              get: () => config.font_family || defaultConfig.font_family,
+              set: (value) => {
+                config.font_family = value;
+                window.elementSdk.setConfig({ font_family: value });
+              },
+            },
+            fontSizeable: {
+              get: () => config.font_size || defaultConfig.font_size,
+              set: (value) => {
+                config.font_size = value;
+                window.elementSdk.setConfig({ font_size: value });
+              },
+            },
+          }),
+          mapToEditPanelValues: (config) =>
+            new Map([
+              ["page_title", config.page_title || defaultConfig.page_title],
+              ["subtitle", config.subtitle || defaultConfig.subtitle],
+              [
+                "add_button_text",
+                config.add_button_text || defaultConfig.add_button_text,
+              ],
+              [
+                "complete_button_text",
+                config.complete_button_text ||
+                  defaultConfig.complete_button_text,
+              ],
+            ]),
+        });
+      }
+
+      init();
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'9a616918d7d600c9',t:'MTc2NDQxMjAyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
